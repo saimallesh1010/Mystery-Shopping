@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mystery Shopper — Maple</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── Design tokens ─────────────────────────────────────────────────── */
+:root {
+  --accent:   #3d7fff;
+  --hot:      #ff3951;  --hot-a:  rgba(255,57,81,.08);  --hot-b:  rgba(255,57,81,.2);
+  --warm:     #ff9400;  --warm-a: rgba(255,148,0,.08);  --warm-b: rgba(255,148,0,.2);
+  --cold:     #00c98b;  --cold-a: rgba(0,201,139,.08);  --cold-b: rgba(0,201,139,.2);
+  --radius:   11px;
+  --radius-s: 7px;
+  --radius-xs:5px;
+  --font:    'Plus Jakarta Sans', -apple-system, sans-serif;
+  --mono:    'JetBrains Mono', monospace;
+}
+[data-theme="dark"] {
+  --bg:   #04050b;
+  --c1:   #080a13;
+  --c2:   #0c0e1a;
+  --c3:   #101320;
+  --bd:   #151829;
+  --bd2:  #1b1f35;
+  --t1:   #eaedfa;
+  --t2:   #606480;
+  --t3:   #2a2e4a;
+  color-scheme: dark;
+}
+[data-theme="light"] {
+  --bg:   #f2f3fb;
+  --c1:   #ffffff;
+  --c2:   #ebedf6;
+  --c3:   #e3e6f2;
+  --bd:   #dde0ef;
+  --bd2:  #ccd0e3;
+  --t1:   #090b1c;
+  --t2:   #555a7a;
+  --t3:   #9da3c0;
+  color-scheme: light;
+}
+
+/* ─── Reset ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 14px; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--t1);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background .2s, color .2s;
+}
+button { font-family: var(--font); }
+
+/* ─── Header ─────────────────────────────────────────────────────────── */
+header {
+  height: 54px;
+  background: var(--c1);
+  border-bottom: 1px solid var(--bd);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  position: sticky; top: 0; z-index: 100;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 18px rgba(61,127,255,.3);
+  flex-shrink: 0;
+}
+.brand-mark svg { width: 16px; height: 16px; }
+.brand-name { font-weight: 700; font-size: .9375rem; letter-spacing: -.025em; color: var(--t1); line-height: 1.2; }
+.brand-sub  { font-size: .625rem; color: var(--t3); letter-spacing: .03em; }
+
+.hdr-end { display: flex; align-items: center; gap: 10px; }
+
+.live-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 99px;
+  border: 1px solid var(--cold-b); background: var(--cold-a);
+  font-size: .5625rem; font-weight: 800; letter-spacing: .09em;
+  color: var(--cold);
+}
+.live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--cold); animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.18} }
+
+.theme-tog {
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid var(--bd2); background: var(--c2);
+  color: var(--t2); cursor: pointer; font-size: .9rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.theme-tog:hover { background: var(--bd2); color: var(--t1); }
+
+.hdr-clock { font-family: var(--mono); font-size: .625rem; color: var(--t3); min-width: 64px; text-align: right; }
+
+/* ─── Page ─────────────────────────────────────────────────────────── */
+.page { max-width: 1360px; margin: 0 auto; padding: 22px 28px 60px; }
+
+/* ─── KPI Strip ─────────────────────────────────────────────────────── */
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+
+.kpi {
+  background: var(--c1);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  padding: 18px 20px 16px;
+  position: relative; overflow: hidden;
+  border-top: 2.5px solid var(--kc, var(--bd2));
+}
+/* Radial glow blob in corner */
+.kpi::after {
+  content: '';
+  position: absolute; top: -10px; right: -10px;
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--kc, transparent);
+  opacity: .07; pointer-events: none;
+  filter: blur(16px);
+}
+.kpi.k-all  { --kc: var(--accent); }
+.kpi.k-hot  { --kc: var(--hot); }
+.kpi.k-warm { --kc: var(--warm); }
+.kpi.k-cold { --kc: var(--cold); }
+.kpi-ey   { font-size: .5625rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); margin-bottom: 10px; }
+.kpi-num  {
+  font-family: var(--mono); font-size: 2.25rem; font-weight: 600;
+  letter-spacing: -.04em; line-height: 1;
+  color: var(--kc, var(--t1));
+}
+.kpi.k-all .kpi-num { color: var(--t1); }
+.kpi-sub  { font-size: .6875rem; color: var(--t3); margin-top: 7px; line-height: 1.5; }
+
+/* ─── Toolbar ─────────────────────────────────────────────────────── */
+.toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+
+.seg {
+  display: flex; align-items: center;
+  background: var(--c1); border: 1px solid var(--bd);
+  border-radius: var(--radius-s); padding: 3px; gap: 2px;
+}
+.seg-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 5px;
+  border: none; background: transparent; cursor: pointer;
+  font-size: .8125rem; font-weight: 600; color: var(--t2);
+  transition: background .12s, color .12s;
+}
+.seg-btn:hover { background: var(--c2); color: var(--t1); }
+.seg-btn.on    { background: var(--c2); color: var(--t1); }
+.seg-btn.on.f-hot  { color: var(--hot);  background: var(--hot-a); }
+.seg-btn.on.f-warm { color: var(--warm); background: var(--warm-a); }
+.seg-btn.on.f-cold { color: var(--cold); background: var(--cold-a); }
+.seg-chip {
+  font-family: var(--mono); font-size: .5625rem; font-weight: 600;
+  min-width: 16px; height: 15px; padding: 0 3px;
+  border-radius: 4px; background: var(--bd); color: var(--t3);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.seg-btn.on .seg-chip { background: rgba(255,255,255,.07); color: inherit; }
+
+.search-box { flex: 1; max-width: 274px; margin-left: auto; position: relative; }
+.search-icon {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; color: var(--t3); pointer-events: none;
+}
+.search-in {
+  width: 100%; height: 34px; padding: 0 12px 0 32px;
+  background: var(--c1); border: 1px solid var(--bd);
+  border-radius: var(--radius-s);
+  font-size: .8125rem; color: var(--t1); outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.search-in::placeholder { color: var(--t3); }
+.search-in:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(61,127,255,.13); }
+
+/* ─── Table card ─────────────────────────────────────────────────── */
+.tcard {
+  background: var(--c1);
+  border: 1px solid var(--bd);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.tscroll { overflow-x: auto; }
+
+table {
+  width: 100%; border-collapse: collapse;
+  table-layout: fixed; min-width: 820px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Column widths on <th> */
+th.c0 { width: 22%; }   /* Restaurant */
+th.c1 { width: 14%; }   /* Phone */
+th.c2 { width: 11%; }   /* Score */
+th.c3 { width: 9%;  }   /* Signal */
+th.c4 { width: 11%; }   /* Status */
+/* th.c5 intentionally omitted — SDR Notes fills remaining width */
+th.c6 { width: 36px; }  /* Arrow */
+
+thead tr { background: var(--bg); border-bottom: 1px solid var(--bd); }
+thead th {
+  padding: 9px 14px;
+  font-size: .5625rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--t3);
+  text-align: left; white-space: nowrap;
+  user-select: none;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--bd);
+  cursor: pointer;
+  /* Signal stripe via gradient — zero layout impact, perfect browser support */
+  background-image: linear-gradient(90deg, transparent 3px, transparent 3px);
+  transition: background-image .1s;
+}
+tbody tr:last-child { border-bottom: none; }
+
+/* Stripe + hover sweep — the scan-pulse effect unique to this tool */
+tbody tr.sig-hot  { background-image: linear-gradient(90deg, var(--hot) 3px, transparent 3px); }
+tbody tr.sig-warm { background-image: linear-gradient(90deg, var(--warm) 3px, transparent 3px); }
+tbody tr.sig-cold { background-image: linear-gradient(90deg, var(--cold) 3px, transparent 3px); }
+
+tbody tr.sig-hot:hover  { background-image: linear-gradient(90deg, var(--hot) 3px, rgba(255,57,81,.055) 28%, transparent 65%); }
+tbody tr.sig-warm:hover { background-image: linear-gradient(90deg, var(--warm) 3px, rgba(255,148,0,.055) 28%, transparent 65%); }
+tbody tr.sig-cold:hover { background-image: linear-gradient(90deg, var(--cold) 3px, rgba(0,201,139,.055) 28%, transparent 65%); }
+tbody tr:hover .row-arrow { opacity: 1; }
+
+td { padding: 12px 14px; vertical-align: middle; overflow: hidden; }
+td:first-child { padding-left: 20px; }
+td:last-child  { padding-right: 10px; text-align: right; }
+
+/* Cell content */
+.r-name { font-weight: 600; font-size: .875rem; color: var(--t1); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.r-city { font-size: .6875rem; color: var(--t3); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.r-phone {
+  font-family: var(--mono); font-size: .8125rem; color: var(--t2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;
+}
+.score-col { display: flex; flex-direction: column; gap: 5px; }
+.score-n   { font-family: var(--mono); font-size: .875rem; font-weight: 500; }
+.score-track { height: 2px; width: 60px; background: var(--bd2); border-radius: 99px; overflow: hidden; }
+.score-fill  { height: 100%; border-radius: 99px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 99px;
+  font-size: .5625rem; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; border: 1px solid transparent; white-space: nowrap;
+}
+.badge.hot  { background: var(--hot-a);  color: var(--hot);  border-color: var(--hot-b);  }
+.badge.warm { background: var(--warm-a); color: var(--warm); border-color: var(--warm-b); }
+.badge.cold { background: var(--cold-a); color: var(--cold); border-color: var(--cold-b); }
+.badge-dot  { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+.status-tag {
+  display: inline-flex; align-items: center;
+  padding: 3px 8px; border-radius: 5px;
+  font-size: .6875rem; font-weight: 500;
+  background: var(--c2); color: var(--t2);
+  border: 1px solid var(--bd2); white-space: nowrap;
+}
+.notes-cell { font-size: .8125rem; color: var(--t2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-arrow  { color: var(--t3); opacity: 0; transition: opacity .15s; font-size: .75rem; }
+
+/* Empty state */
+.empty { padding: 56px 24px; text-align: center; }
+.empty-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--c2); border: 1px solid var(--bd2);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+}
+.empty-icon svg { width: 18px; height: 18px; color: var(--t3); }
+.empty-title { font-size: .9375rem; font-weight: 600; color: var(--t2); margin-bottom: 5px; }
+.empty-desc  { font-size: .8125rem; color: var(--t3); line-height: 1.75; }
+.empty-desc code {
+  font-family: var(--mono); font-size: .75rem;
+  background: var(--c2); border: 1px solid var(--bd2);
+  padding: 1px 6px; border-radius: 4px; color: var(--t2);
+}
+
+/* Row entrance */
+@keyframes fadeSlide { from { opacity:0; transform:translateY(4px) } to { opacity:1; transform:none } }
+.row-in { animation: fadeSlide .22s ease both; }
+
+/* ─── Overlay ─────────────────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(4,5,11,.68); backdrop-filter: blur(3px);
+  z-index: 200; opacity: 0; pointer-events: none;
+  transition: opacity .22s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+/* ─── Drawer ──────────────────────────────────────────────────────── */
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: 490px; max-width: 100vw;
+  background: var(--c1); border-left: 1px solid var(--bd);
+  z-index: 201;
+  transform: translateX(100%);
+  transition: transform .28s cubic-bezier(.25,0,.2,1);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.drawer.open { transform: none; }
+.drawer::-webkit-scrollbar { width: 4px; }
+.drawer::-webkit-scrollbar-thumb { background: var(--bd2); border-radius: 99px; }
+
+.dw-hdr {
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--bd);
+  position: sticky; top: 0; background: var(--c1); z-index: 1;
+}
+.dw-toprow { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+.dw-name   { font-size: 1.0625rem; font-weight: 700; color: var(--t1); line-height: 1.3; }
+.dw-close  {
+  width: 26px; height: 26px; border-radius: 6px;
+  border: 1px solid var(--bd2); background: var(--c2);
+  color: var(--t2); cursor: pointer; font-size: .75rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; flex-shrink: 0;
+}
+.dw-close:hover { background: var(--bd2); color: var(--t1); }
+.dw-meta  { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.dw-phone { font-family: var(--mono); font-size: .8125rem; color: var(--t2); }
+.dw-sep   { color: var(--t3); font-size: .75rem; }
+.dw-loc   { font-size: .75rem; color: var(--t3); }
+
+.dw-body  { padding: 20px 22px; display: flex; flex-direction: column; gap: 22px; }
+
+/* Ring */
+.ring-row { display: flex; align-items: center; gap: 20px; }
+.ring-wrap { position: relative; width: 106px; height: 106px; flex-shrink: 0; }
+.ring-wrap svg { width: 106px; height: 106px; }
+.ring-bg   { fill: none; stroke: var(--bd2); stroke-width: 7; }
+.ring-arc  {
+  fill: none; stroke-width: 7; stroke-linecap: round;
+  transform-origin: 53px 53px; transform: rotate(-90deg);
+  transition: stroke-dashoffset .8s cubic-bezier(.35,0,.2,1);
+}
+.ring-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.ring-score { font-family: var(--mono); font-size: 1.5rem; font-weight: 600; letter-spacing: -.03em; line-height: 1; }
+.ring-denom { font-size: .5rem; color: var(--t3); margin-top: 3px; letter-spacing: .05em; text-transform: uppercase; }
+.sdr-card {
+  flex: 1; border-radius: var(--radius-s); padding: 11px 13px;
+  font-size: .8125rem; line-height: 1.65; border: 1px solid transparent;
+}
+.sdr-card.hot  { background: var(--hot-a);  border-color: var(--hot-b);  color: #ffa8b6; }
+.sdr-card.warm { background: var(--warm-a); border-color: var(--warm-b); color: #ffd17a; }
+.sdr-card.cold { background: var(--cold-a); border-color: var(--cold-b); color: #7cf5cc; }
+
+.divider { height: 1px; background: var(--bd); flex-shrink: 0; }
+
+/* Section heading */
+.sec-head {
+  font-size: .5625rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--t3); margin-bottom: 12px;
+}
+
+/* Dimension bars */
+.dims { display: flex; flex-direction: column; gap: 9px; }
+.dim  { display: grid; grid-template-columns: 140px 1fr 36px; align-items: center; gap: 10px; }
+.dim-l { font-size: .8125rem; color: var(--t2); }
+.dim-wt { font-size: .6rem; color: var(--t3); margin-left: 3px; }
+.dim-tr { height: 3px; background: var(--c3); border-radius: 99px; overflow: hidden; }
+.dim-fi { height: 100%; border-radius: 99px; transition: width .5s cubic-bezier(.35,0,.2,1); }
+.dim-v  { font-family: var(--mono); font-size: .6875rem; font-weight: 500; color: var(--t1); text-align: right; }
+
+/* Attribute tags */
+.tag-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 8px; border-radius: var(--radius-xs);
+  font-size: .6875rem; font-weight: 600; border: 1px solid transparent;
+}
+.tag.yes { background: var(--cold-a); color: var(--cold); border-color: var(--cold-b); }
+.tag.no  { background: var(--hot-a);  color: var(--hot);  border-color: var(--hot-b); }
+.extras  { font-family: var(--mono); font-size: .6875rem; color: var(--t3); line-height: 2; margin-top: 9px; }
+
+/* Issues */
+.issue-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.issue { display: flex; gap: 8px; align-items: flex-start; font-size: .8125rem; color: var(--t2); line-height: 1.55; }
+.issue-pip { width: 5px; height: 5px; border-radius: 50%; background: var(--hot); flex-shrink: 0; margin-top: 5px; }
+
+/* Notes / transcript */
+.notes-box {
+  background: var(--c2); border: 1px solid var(--bd);
+  border-radius: var(--radius-s); padding: 11px 13px;
+  font-size: .8125rem; color: var(--t2); line-height: 1.7;
+}
+.tx-box {
+  background: var(--bg); border: 1px solid var(--bd);
+  border-radius: var(--radius-s); padding: 12px 14px;
+  font-family: var(--mono); font-size: .6875rem;
+  color: var(--t2); line-height: 1.85;
+  white-space: pre-wrap; max-height: 186px; overflow-y: auto;
+}
+.tx-box::-webkit-scrollbar { width: 3px; }
+.tx-box::-webkit-scrollbar-thumb { background: var(--bd2); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<!-- ─── Header ─────────────────────────────────────────────────────── -->
+<header>
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 14V7.5L8 3l6 4.5V14"/><path d="M5.5 14V9.5h5V14"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">Maple</div>
+      <div class="brand-sub">Mystery Shopper</div>
+    </div>
+  </div>
+  <div class="hdr-end">
+    <div class="live-pill"><span class="live-dot"></span>LIVE</div>
+    <button class="theme-tog" id="theme-tog" onclick="toggleTheme()">
+      <span id="theme-icon">☀️</span>
+    </button>
+    <div class="hdr-clock" id="hdr-clock">—</div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- ─── KPI Strip ──────────────────────────────────────────────── -->
+  <div class="stats">
+    <div class="kpi k-all">
+      <div class="kpi-ey">Total Called</div>
+      <div class="kpi-num" id="kv-total">0</div>
+      <div class="kpi-sub" id="kv-sub">—</div>
+    </div>
+    <div class="kpi k-hot">
+      <div class="kpi-ey">HOT Leads</div>
+      <div class="kpi-num" id="kv-hot">0</div>
+      <div class="kpi-sub">High pain · prioritize</div>
+    </div>
+    <div class="kpi k-warm">
+      <div class="kpi-ey">WARM Leads</div>
+      <div class="kpi-num" id="kv-warm">0</div>
+      <div class="kpi-sub">Some friction · worth outreach</div>
+    </div>
+    <div class="kpi k-cold">
+      <div class="kpi-ey">COLD Leads</div>
+      <div class="kpi-num" id="kv-cold">0</div>
+      <div class="kpi-sub">Solid experience · lower priority</div>
+    </div>
+  </div>
+
+  <!-- ─── Toolbar ───────────────────────────────────────────────── -->
+  <div class="toolbar">
+    <div class="seg">
+      <button class="seg-btn on"     data-f="all"  onclick="setFilter('all')">All    <span class="seg-chip" id="ch-all">0</span></button>
+      <button class="seg-btn f-hot"  data-f="hot"  onclick="setFilter('hot')">HOT    <span class="seg-chip" id="ch-hot">0</span></button>
+      <button class="seg-btn f-warm" data-f="warm" onclick="setFilter('warm')">WARM   <span class="seg-chip" id="ch-warm">0</span></button>
+      <button class="seg-btn f-cold" data-f="cold" onclick="setFilter('cold')">COLD   <span class="seg-chip" id="ch-cold">0</span></button>
+    </div>
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/>
+      </svg>
+      <input class="search-in" id="search-in" placeholder="Search restaurant or city…" oninput="renderTable()">
+    </div>
+  </div>
+
+  <!-- ─── Table ─────────────────────────────────────────────────── -->
+  <div class="tcard">
+    <div class="tscroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="c0">Restaurant</th>
+            <th class="c1">Phone</th>
+            <th class="c2">Score</th>
+            <th class="c3">Signal</th>
+            <th class="c4">Status</th>
+            <th class="c5">SDR Notes</th>
+            <th class="c6"></th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="7">
+            <div class="empty">
+              <div class="empty-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+                </svg>
+              </div>
+              <div class="empty-title">Loading results…</div>
+            </div>
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── Overlay ───────────────────────────────────────────────────── -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<!-- ─── Drawer ────────────────────────────────────────────────────── -->
+<aside class="drawer" id="drawer">
+  <div class="dw-hdr">
+    <div class="dw-toprow">
+      <div class="dw-name" id="dw-name">—</div>
+      <button class="dw-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="dw-meta">
+      <span class="badge" id="dw-badge"></span>
+      <span class="dw-sep">·</span>
+      <span class="dw-phone" id="dw-phone"></span>
+      <span class="dw-sep">·</span>
+      <span class="dw-loc" id="dw-loc"></span>
+    </div>
+  </div>
+
+  <div class="dw-body">
+
+    <!-- Score ring + SDR note -->
+    <div class="ring-row">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 106 106">
+          <circle class="ring-bg"  cx="53" cy="53" r="44"/>
+          <circle class="ring-arc" id="dw-arc" cx="53" cy="53" r="44"
+            stroke-dasharray="276.5" stroke-dashoffset="276.5"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-score" id="dw-score">—</div>
+          <div class="ring-denom">/ 100</div>
+        </div>
+      </div>
+      <div class="sdr-card" id="dw-sdrcard"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Score breakdown -->
+    <div>
+      <div class="sec-head">Score Breakdown</div>
+      <div class="dims" id="dw-dims"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Call attributes -->
+    <div>
+      <div class="sec-head">Call Attributes</div>
+      <div class="tag-row" id="dw-tags"></div>
+      <div class="extras" id="dw-extras"></div>
+    </div>
+
+    <!-- Issues -->
+    <div id="dw-issues-wrap">
+      <div class="sec-head">Issues Detected</div>
+      <ul class="issue-list" id="dw-issues"></ul>
+    </div>
+
+    <!-- Notes -->
+    <div>
+      <div class="sec-head">Extraction Notes</div>
+      <div class="notes-box" id="dw-notes"></div>
+    </div>
+
+    <!-- Transcript -->
+    <div id="dw-tx-wrap" style="display:none">
+      <div class="sec-head">Transcript</div>
+      <div class="tx-box" id="dw-tx"></div>
+    </div>
+
+  </div>
+</aside>
+
+<script>
+// ─── Constants ────────────────────────────────────────────────────────
+var CIRC = 276.5;  // 2π × 44
+var allData = [];
+var activeFilter = 'all';
+
+// ─── Theme ────────────────────────────────────────────────────────────
+(function () {
+  var saved = localStorage.getItem('maple-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('theme-icon').textContent = saved === 'dark' ? '☀️' : '🌙';
+}());
+
+function toggleTheme() {
+  var cur  = document.documentElement.getAttribute('data-theme');
+  var next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  document.getElementById('theme-icon').textContent = next === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('maple-theme', next);
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function fmtPhone(p) {
+  p = String(p || '');
+  if (p.length === 10) return '(' + p.slice(0,3) + ') ' + p.slice(3,6) + '-' + p.slice(6);
+  return p;
+}
+function sigColor(n) {
+  return n < 40 ? 'var(--hot)' : n < 70 ? 'var(--warm)' : 'var(--cold)';
+}
+function fmtStatus(s) {
+  return ({ answered:'Answered', no_answer:'No Answer', voicemail:'Voicemail', busy:'Busy Signal', failed:'Failed' }[s] || s);
+}
+function countUp(el, target) {
+  var dur = 600, t0 = performance.now();
+  (function step(t) {
+    var p = Math.min((t - t0) / dur, 1);
+    el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * target);
+    if (p < 1) requestAnimationFrame(step);
+  }(performance.now()));
+}
+
+// ─── Data ─────────────────────────────────────────────────────────────
+async function load() {
+  try {
+    var r    = await fetch('/api/results');
+    var data = await r.json();
+    var changed = data.length !== allData.length;
+    allData = data;
+    if (changed) renderStats();
+    var now = new Date();
+    document.getElementById('hdr-clock').textContent =
+      now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  } catch (e) { console.error(e); }
+}
+
+function renderStats() {
+  var hot  = allData.filter(function(r){ return r.sdr_signal === 'hot';  }).length;
+  var warm = allData.filter(function(r){ return r.sdr_signal === 'warm'; }).length;
+  var cold = allData.filter(function(r){ return r.sdr_signal === 'cold'; }).length;
+
+  countUp(document.getElementById('kv-total'), allData.length);
+  countUp(document.getElementById('kv-hot'),   hot);
+  countUp(document.getElementById('kv-warm'),  warm);
+  countUp(document.getElementById('kv-cold'),  cold);
+
+  document.getElementById('kv-sub').textContent = allData.length + ' restaurants evaluated';
+  document.getElementById('ch-all').textContent  = allData.length;
+  document.getElementById('ch-hot').textContent  = hot;
+  document.getElementById('ch-warm').textContent = warm;
+  document.getElementById('ch-cold').textContent = cold;
+
+  renderTable();
+}
+
+// ─── Table ────────────────────────────────────────────────────────────
+function getVisible() {
+  var q = (document.getElementById('search-in').value || '').toLowerCase().trim();
+  return allData.filter(function(r) {
+    if (activeFilter !== 'all' && r.sdr_signal !== activeFilter) return false;
+    if (q) {
+      var nm = (r.restaurant_name || '').toLowerCase();
+      var ct = (r.city || '').toLowerCase();
+      if (nm.indexOf(q) < 0 && ct.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+}
+
+function renderTable() {
+  var rows = getVisible();
+  if (!rows.length) {
+    document.getElementById('tbody').innerHTML =
+      '<tr><td colspan="7"><div class="empty">' +
+      '<div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 12h18M12 3v18"/></svg></div>' +
+      '<div class="empty-title">No results</div>' +
+      '<div class="empty-desc">Run <code>npm run demo</code> to generate data, or clear the filter.</div>' +
+      '</div></td></tr>';
+    return;
+  }
+
+  document.getElementById('tbody').innerHTML = rows.map(function(r, i) {
+    var answered = Boolean(r.was_answered);
+    var score    = answered ? Math.round(r.score_overall) : null;
+
+    var scoreCell = score !== null
+      ? '<div class="score-col">' +
+          '<span class="score-n" style="color:' + sigColor(score) + '">' +
+            score + '<span style="font-size:.625rem;color:var(--t3)">/100</span></span>' +
+          '<div class="score-track"><div class="score-fill" style="width:' + score + '%;background:' + sigColor(score) + '"></div></div>' +
+        '</div>'
+      : '<span style="color:var(--t3);font-size:.875rem">—</span>';
+
+    return '<tr class="sig-' + r.sdr_signal + ' row-in" style="animation-delay:' + (i * 25) + 'ms" onclick="openDrawer(' + i + ')">' +
+      '<td><div class="r-name">' + esc(r.restaurant_name) + '</div>' +
+           '<div class="r-city">'  + esc(r.city) + ', ' + esc(r.state) + '</div></td>' +
+      '<td><span class="r-phone">' + esc(fmtPhone(r.phone)) + '</span></td>' +
+      '<td>' + scoreCell + '</td>' +
+      '<td><span class="badge ' + r.sdr_signal + '"><span class="badge-dot"></span>' + r.sdr_signal.toUpperCase() + '</span></td>' +
+      '<td><span class="status-tag">' + esc(fmtStatus(r.call_status)) + '</span></td>' +
+      '<td class="notes-cell">' + esc((r.sdr_notes || '').slice(0, 90)) + '</td>' +
+      '<td><span class="row-arrow">›</span></td>' +
+      '</tr>';
+  }).join('');
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.seg-btn').forEach(function(b) {
+    b.classList.toggle('on', b.dataset.f === f);
+  });
+  renderTable();
+}
+
+// ─── Drawer ───────────────────────────────────────────────────────────
+function openDrawer(idx) {
+  var r = getVisible()[idx];
+  if (!r) return;
+
+  // Header
+  document.getElementById('dw-name').textContent  = r.restaurant_name;
+  document.getElementById('dw-phone').textContent = fmtPhone(r.phone);
+  document.getElementById('dw-loc').textContent   = r.city + ', ' + r.state;
+  var badge = document.getElementById('dw-badge');
+  badge.className = 'badge ' + r.sdr_signal;
+  badge.innerHTML = '<span class="badge-dot"></span>' + r.sdr_signal.toUpperCase();
+
+  // SDR card
+  var card = document.getElementById('dw-sdrcard');
+  card.className = 'sdr-card ' + r.sdr_signal;
+  card.textContent = r.sdr_notes || '—';
+
+  // Ring
+  var score = r.was_answered ? Math.round(r.score_overall) : null;
+  var arc   = document.getElementById('dw-arc');
+  var sn    = document.getElementById('dw-score');
+  if (score !== null) {
+    arc.style.stroke = sigColor(score);
+    arc.style.strokeDashoffset = CIRC * (1 - score / 100);
+    sn.style.color = sigColor(score);
+    sn.textContent = score;
+  } else {
+    arc.style.stroke = 'var(--t3)';
+    arc.style.strokeDashoffset = CIRC;
+    sn.style.color = 'var(--t3)';
+    sn.textContent = '—';
+  }
+
+  // Dimension bars
+  var dims = [
+    { k: 'score_pickup',            l: 'Pickup',           w: '20%' },
+    { k: 'score_greeting',          l: 'Greeting',         w: '15%' },
+    { k: 'score_responsiveness',    l: 'Responsiveness',   w: '25%' },
+    { k: 'score_order_capability',  l: 'Order Capability', w: '25%' },
+    { k: 'score_accuracy',          l: 'Accuracy',         w: '10%' },
+    { k: 'score_friendliness',      l: 'Friendliness',     w: '5%'  }
+  ];
+  document.getElementById('dw-dims').innerHTML = dims.map(function(d) {
+    var v   = r[d.k] || 0;
+    var pct = v * 10;
+    return '<div class="dim">' +
+      '<span class="dim-l">' + d.l + '<span class="dim-wt">(' + d.w + ')</span></span>' +
+      '<div class="dim-tr"><div class="dim-fi" style="width:' + pct + '%;background:' + sigColor(pct) + '"></div></div>' +
+      '<span class="dim-v">' + v + '/10</span>' +
+    '</div>';
+  }).join('');
+
+  // Attribute tags
+  var tagDefs = [
+    { k: 'was_answered',              l: 'Answered',      inv: false },
+    { k: 'had_professional_greeting', l: 'Pro Greeting',  inv: false },
+    { k: 'restaurant_name_mentioned', l: 'Name Stated',   inv: false },
+    { k: 'could_take_order',          l: 'Took Order',    inv: false },
+    { k: 'order_confirmed',           l: 'Confirmed',     inv: false },
+    { k: 'put_on_hold',               l: 'Put on Hold',   inv: true  },
+    { k: 'upsell_attempted',          l: 'Upsell',        inv: false }
+  ];
+  document.getElementById('dw-tags').innerHTML = tagDefs.map(function(t) {
+    var v   = Boolean(r[t.k]);
+    var pos = t.inv ? !v : v;
+    return '<span class="tag ' + (pos ? 'yes' : 'no') + '">' + (pos ? '✓' : '✗') + ' ' + t.l + '</span>';
+  }).join('');
+
+  var ex = [];
+  if (r.rings_before_answer)   ex.push('Rings: '    + r.rings_before_answer);
+  if (r.hold_duration_seconds) ex.push('Hold: '     + r.hold_duration_seconds + 's');
+  if (r.estimated_wait_time)   ex.push('Wait: '     + r.estimated_wait_time);
+  if (r.staff_friendliness)    ex.push('Staff: '    + r.staff_friendliness);
+  document.getElementById('dw-extras').textContent = ex.join('   ·   ');
+
+  // Issues
+  var issues = [];
+  try { issues = JSON.parse(r.issues || '[]'); } catch (e) {}
+  var iw = document.getElementById('dw-issues-wrap');
+  if (issues.length) {
+    iw.style.display = '';
+    document.getElementById('dw-issues').innerHTML = issues.map(function(iss) {
+      return '<li class="issue"><span class="issue-pip"></span>' + esc(String(iss)) + '</li>';
+    }).join('');
+  } else {
+    iw.style.display = 'none';
+  }
+
+  // Notes
+  document.getElementById('dw-notes').textContent = r.extraction_notes || 'No extraction notes.';
+
+  // Transcript
+  var txw = document.getElementById('dw-tx-wrap');
+  if (r.transcript) {
+    txw.style.display = '';
+    document.getElementById('dw-tx').textContent = r.transcript.split('\n').slice(0, 14).join('\n');
+  } else {
+    txw.style.display = 'none';
+  }
+
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDrawer(); });
+
+// ─── Boot ─────────────────────────────────────────────────────────────
+load();
+setInterval(load, 10000);
+</script>
+</body>
+</html>
