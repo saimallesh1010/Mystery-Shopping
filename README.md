@@ -1,4 +1,4 @@
-# Maple Mystery Shopper
+#  Mystery Shopper
 
 An AI mystery-shopping system that calls restaurants, evaluates their phone experience, and surfaces structured SDR signals so the sales team knows exactly who to call and why — before the first outreach.
 
