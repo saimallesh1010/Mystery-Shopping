@@ -11,7 +11,7 @@ import { getDb } from '../db/schema';
 import { config } from '../config/settings';
 import type { ScheduledLead, CallProvider } from '../types';
 
-// Swap this import for a real provider (Vapi, Bland.ai, Twilio) — interface is CallProvider
+// need to Swap this import for a real provider (Vapi, Bland.ai, Twilio) — interface is CallProvider
 const callProvider: CallProvider = placeCall;
 
 export interface OrchestratorResult {
