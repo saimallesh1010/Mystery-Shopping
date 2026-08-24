@@ -5,9 +5,9 @@ import { URL } from 'url';
 import { getAllResults, countLeads } from './db/repository';
 
 const PORT = parseInt(process.env.PORT ?? '3000');
-const HTML = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf-8');
+const HTML = fs.readFileSync(path.join(process.cwd(), 'src', 'public', 'index.html'), 'utf-8');
 
-function handleRequest(req: http.IncomingMessage, res: http.ServerResponse): void {
+export function handleRequest(req: http.IncomingMessage, res: http.ServerResponse): void {
   const url = new URL(req.url ?? '/', `http://localhost:${PORT}`);
 
   if (url.pathname === '/api/results') {
@@ -26,12 +26,16 @@ function handleRequest(req: http.IncomingMessage, res: http.ServerResponse): voi
   res.end(HTML);
 }
 
-const server = http.createServer((req, res) => {
-  try { handleRequest(req, res); }
-  catch (err) { res.writeHead(500); res.end((err as Error).message); }
-});
+export function startServer(): void {
+  const server = http.createServer((req, res) => {
+    try { handleRequest(req, res); }
+    catch (err) { res.writeHead(500); res.end((err as Error).message); }
+  });
 
-server.listen(PORT, () => {
-  console.log('\n  Mystery Shopper Dashboard');
-  console.log('  http://localhost:' + PORT + '\n');
-});
+  server.listen(PORT, () => {
+    console.log('\n  Mystery Shopper Dashboard');
+    console.log('  http://localhost:' + PORT + '\n');
+  });
+}
+
+if (require.main === module) startServer();
