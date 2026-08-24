@@ -9,7 +9,7 @@
     "demo": "tsx src/index.ts demo",
     "reset": "tsx src/index.ts reset",
     "serve": "tsx src/server.ts",
-    "build": "tsc --project tsconfig.json --noEmit",
+    "build": "node ./node_modules/typescript/bin/tsc --project tsconfig.json --noEmit",
     "test": "tsx --test tests/*.test.ts"
   },
   "dependencies": {
