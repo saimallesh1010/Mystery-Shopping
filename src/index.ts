@@ -46,7 +46,7 @@ function cmdImport(): void {
     }
     const { total } = countLeads();
     console.log(`\n  Total leads in DB: ${total}`);
-    console.log('\nNext step: npm run run-calls\n');
+    console.log('\nNext step: npm run run\n');
   } catch (err) {
     console.error(`Import failed: ${(err as Error).message}`);
     process.exit(1);
@@ -106,17 +106,15 @@ async function cmdDemo(): Promise<void> {
   console.log(`  Imported ${importResult.imported}, skipped ${importResult.skipped}\n`);
 
   console.log('Step 2: Check eligible leads');
-  const { getLeadsByStatus } = await import('./db/repository');
-  const pending = getLeadsByStatus('pending');
-  if (pending.length === 0) {
-    console.log('  All leads already processed. Run: npm run reset  then  npm run demo\n');
+  const eligible = getEligibleLeads();
+  if (eligible.length === 0) {
+    console.log('  No leads are eligible right now. Check business hours or run: npm run reset\n');
     printFullReport();
     return;
   }
 
-  const sample = pending.slice(0, limit);
-  const scheduled = sample.map(l => ({ lead: l, attempt_number: 1 }));
-  console.log(`  Running ${scheduled.length} of ${pending.length} pending leads (use --limit=N to change)\n`);
+  const scheduled = eligible.slice(0, limit);
+  console.log(`  Running ${scheduled.length} of ${eligible.length} eligible leads (use --limit=N to change)\n`);
 
   console.log('Step 3: Run mock calls...');
   const results = await runBatch(scheduled);

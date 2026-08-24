@@ -3,6 +3,14 @@ import path from 'path';
 
 dotenv.config();
 
+function readInteger(name: string, fallback: number, minimum: number): number {
+  const value = Number.parseInt(process.env[name] ?? '', 10);
+  return Number.isInteger(value) && value >= minimum ? value : fallback;
+}
+
+const businessHoursStart = readInteger('BUSINESS_HOURS_START', 11, 0);
+const businessHoursEnd = readInteger('BUSINESS_HOURS_END', 21, 1);
+
 export const config = {
   database: {
     path: process.env.DB_PATH
@@ -11,15 +19,15 @@ export const config = {
   },
   calls: {
     provider: (process.env.CALL_PROVIDER ?? 'mock') as 'mock' | 'twilio',
-    mockDelayMs: parseInt(process.env.MOCK_CALL_DELAY_MS ?? '1500'),
-    maxRetries: parseInt(process.env.MAX_RETRIES ?? '2'),
-    retryDelayHours: parseInt(process.env.RETRY_DELAY_HOURS ?? '2'),
-    concurrency: parseInt(process.env.CALL_CONCURRENCY ?? '3'),
+    mockDelayMs: readInteger('MOCK_CALL_DELAY_MS', 1500, 0),
+    maxRetries: readInteger('MAX_RETRIES', 2, 0),
+    retryDelayHours: readInteger('RETRY_DELAY_HOURS', 2, 0),
+    concurrency: readInteger('CALL_CONCURRENCY', 3, 1),
   },
   scheduling: {
-    businessHoursStart: parseInt(process.env.BUSINESS_HOURS_START ?? '11'),
-    businessHoursEnd: parseInt(process.env.BUSINESS_HOURS_END ?? '21'),
-    minCallGapMs: parseInt(process.env.MIN_CALL_GAP_MS ?? '5000'),
+    businessHoursStart: Math.min(businessHoursStart, 23),
+    businessHoursEnd: Math.min(businessHoursEnd, 24),
+    minCallGapMs: readInteger('MIN_CALL_GAP_MS', 5000, 0),
   },
   openai: {
     apiKey: process.env.OPENAI_API_KEY ?? '',
