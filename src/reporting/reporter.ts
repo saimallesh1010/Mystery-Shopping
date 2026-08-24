@@ -33,7 +33,7 @@ export function printFullReport(): void {
   const cold = results.filter(r => r.sdr_signal === 'cold').length;
 
   console.log(`\n${BOLD}${CYAN}╔══════════════════════════════════════════════════════════════════════╗${RESET}`);
-  console.log(`${BOLD}${CYAN}║          MAPLE MYSTERY SHOPPING REPORT                              ║${RESET}`);
+  console.log(`${BOLD}${CYAN}║          MYSTERY SHOPPING REPORT                                    ║${RESET}`);
   console.log(`${BOLD}${CYAN}╚══════════════════════════════════════════════════════════════════════╝${RESET}\n`);
 
   // Summary
@@ -44,7 +44,7 @@ export function printFullReport(): void {
   console.log(`  Scheduled for retry  : ${byStatus['retry'] ?? 0}`);
   console.log(`  Failed               : ${byStatus['failed'] ?? 0}`);
   console.log('');
-  console.log(`  ${RED}${BOLD}HOT${RESET}  prospects : ${hot}   ${DIM}(call these first — strong Maple fit)${RESET}`);
+  console.log(`  ${RED}${BOLD}HOT${RESET}  prospects : ${hot}   ${DIM}(call these first — strongest opportunity)${RESET}`);
   console.log(`  ${YELLOW}${BOLD}WARM${RESET} prospects : ${warm}   ${DIM}(worth outreach)${RESET}`);
   console.log(`  ${GREEN}${BOLD}COLD${RESET} prospects : ${cold}   ${DIM}(already decent, lower priority)${RESET}`);
 

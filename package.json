@@ -1,7 +1,7 @@
 {
   "name": "mystery-shopper",
   "version": "1.0.0",
-  "description": "AI-powered mystery shopping system for restaurant phone experience evaluation",
+  "description": "Mystery shopping system for restaurant phone experience evaluation",
   "scripts": {
     "import": "tsx src/index.ts import",
     "run": "tsx src/index.ts run",

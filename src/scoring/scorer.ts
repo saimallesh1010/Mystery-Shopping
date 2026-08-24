@@ -12,13 +12,13 @@ import type { Extraction, Scores, SdrSignal, CallStatus, StaffFriendliness } fro
  * accuracy          10%   Was order confirmed correctly?
  * friendliness       5%   Staff warmth and engagement
  *
- * SDR signal (for Maple sales team):
- *   hot  → overall < 40  (terrible experience, strong Maple candidate)
+ * SDR signal (for the sales team):
+ *   hot  → overall < 40  (terrible experience, strong candidate)
  *   warm → overall 40–69 (some issues, worth outreach)
  *   cold → overall ≥ 70  (solid phone experience, lower priority)
  *
  * Special case: no_answer / voicemail / busy → auto hot
- * (missing calls = direct revenue loss = best Maple pitch)
+ * (missing calls = direct revenue loss = strongest sales opportunity)
  */
 
 export function scoreCall(
@@ -122,23 +122,23 @@ function computeSdrSignal(
   extraction: Extraction,
   callStatus: CallStatus
 ): { sdrSignal: SdrSignal; sdrNotes: string } {
-  // Unanswered calls = hottest leads (Maple directly solves missed calls)
+  // Unanswered calls are the highest-priority leads because missed calls lose revenue.
   if (callStatus === 'no_answer') {
     return {
       sdrSignal: 'hot',
-      sdrNotes: 'Never answered — missing calls means lost revenue. Maple can capture every lead.',
+      sdrNotes: 'Never answered — missing calls means lost revenue. An automated caller can capture every lead.',
     };
   }
   if (callStatus === 'voicemail') {
     return {
       sdrSignal: 'hot',
-      sdrNotes: 'Reached voicemail — callers expecting a person hang up. Maple answers every call.',
+      sdrNotes: 'Reached voicemail — callers expecting a person hang up. An automated caller can answer every call.',
     };
   }
   if (callStatus === 'busy') {
     return {
       sdrSignal: 'hot',
-      sdrNotes: 'Busy signal detected — single line is a bottleneck. Maple handles concurrent calls.',
+      sdrNotes: 'Busy signal detected — single line is a bottleneck. Concurrent call handling could capture more orders.',
     };
   }
 
@@ -147,23 +147,23 @@ function computeSdrSignal(
 
   if (scores.overall < 40) {
     const pain = !extraction.could_take_order
-      ? 'Staff refused phone orders — Maple ensures every call converts.'
+      ? 'Staff refused phone orders — better phone coverage could help convert every call.'
       : extraction.staff_friendliness === 'poor'
-      ? 'Rude or dismissive staff — Maple delivers consistent, branded experience.'
-      : `Poor overall experience (${scores.overall}/100). Maple addresses: ${issues || 'multiple friction points'}.`;
+      ? 'Rude or dismissive staff — consistent service could improve the caller experience.'
+      : `Poor overall experience (${scores.overall}/100). Key issues: ${issues || 'multiple friction points'}.`;
     return { sdrSignal: 'hot', sdrNotes: pain };
   }
 
   if (scores.overall < 70) {
     const note =
       issues
-        ? `Room to improve: ${issues}. Maple could streamline order taking.`
-        : `Average experience (${scores.overall}/100) — Maple could improve speed and consistency.`;
+        ? `Room to improve: ${issues}. Better phone handling could streamline order taking.`
+        : `Average experience (${scores.overall}/100) — better phone handling could improve speed and consistency.`;
     return { sdrSignal: 'warm', sdrNotes: note };
   }
 
   return {
     sdrSignal: 'cold',
-    sdrNotes: `Strong phone experience (${scores.overall}/100) — lower priority for Maple outreach.`,
+    sdrNotes: `Strong phone experience (${scores.overall}/100) — lower priority for outreach.`,
   };
 }

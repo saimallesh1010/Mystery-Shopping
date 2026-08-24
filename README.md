@@ -43,20 +43,20 @@ The extraction step is **completely separate from the scoring step** by design. 
 
 ### Why these 6 scoring dimensions
 
-The rubric is designed around Maple's pitch: restaurants lose revenue when calls go wrong. Each dimension maps to a specific failure mode Maple solves:
+The rubric is designed around a simple sales goal: restaurants lose revenue when calls go wrong. Each dimension maps to a specific phone-experience failure:
 
 | Dimension | Weight | Rationale |
 |---|---|---|
 | Pickup | 20% | No answer = immediate revenue loss. Weighted high because it's the most unambiguous signal. |
 | Responsiveness | 25% | Long holds are the #1 caller complaint. Highest weight because friction here drives hangups. |
-| Order capability | 25% | If they can't take an order over the phone, that's Maple's clearest value prop. |
+| Order capability | 25% | If they can't take an order over the phone, that is a clear opportunity to improve call handling. |
 | Greeting | 15% | Named greeting builds caller confidence; missing it signals disorganization. |
 | Accuracy | 10% | Order confirmation + wait time reduce pickup friction; important but recoverable. |
 | Friendliness | 5% | Matters for brand, but a cold-but-efficient restaurant still takes the order. |
 
 ### Why unanswered calls are auto-HOT regardless of score
 
-A restaurant that doesn't pick up is losing revenue on every ring. Maple's core pitch is "we answer every call." There's no score to compute — the business case sells itself. These leads should be at the top of every SDR's call list.
+A restaurant that doesn't pick up is losing revenue on every ring. Reliable phone coverage can help capture those missed orders. There's no score to compute — the business case sells itself. These leads should be at the top of every SDR's call list.
 
 ### Why deterministic phone-seeded scenarios in the mock
 
@@ -158,11 +158,11 @@ Each dimension scores 0–10. Overall is a weighted composite (0–100).
 
 | Signal | Condition | Sales framing |
 |---|---|---|
-| 🔴 HOT | Score < 40 **or** no-answer/voicemail/busy | Strong Maple candidate — direct revenue loss |
+| 🔴 HOT | Score < 40 **or** no-answer/voicemail/busy | Strong candidate — direct revenue loss |
 | 🟡 WARM | Score 40–69 | Some friction — worth outreach |
 | 🟢 COLD | Score ≥ 70 | Already solid — deprioritize |
 
-**Key insight**: unanswered calls trigger HOT automatically, regardless of score. A restaurant that doesn't pick up is losing a customer on every ring — that's Maple's clearest pitch.
+**Key insight**: unanswered calls trigger HOT automatically, regardless of score. A restaurant that doesn't pick up is losing a customer on every ring — that is the clearest sales opportunity.
 
 ---
 

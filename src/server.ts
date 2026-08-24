@@ -32,6 +32,6 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log('\n  Maple Mystery Shopper Dashboard');
+  console.log('\n  Mystery Shopper Dashboard');
   console.log('  http://localhost:' + PORT + '\n');
 });

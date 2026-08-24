@@ -144,7 +144,7 @@ function cmdReset(): void {
 
 function printHelp(): void {
   console.log(`
-\x1b[1mMaple Mystery Shopper\x1b[0m
+\x1b[1mMystery Shopper\x1b[0m
 
 Usage:
   npm run import [path/to/leads.csv]   Import leads from CSV
