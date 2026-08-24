@@ -31,6 +31,18 @@ export function scoreCall(
 }
 
 function computeScores(extraction: Extraction, callStatus: CallStatus): Scores {
+  if (callStatus === 'no_answer' || callStatus === 'voicemail' || callStatus === 'busy' || callStatus === 'failed') {
+    return {
+      pickup: 0,
+      greeting: 0,
+      responsiveness: 0,
+      order_capability: 0,
+      accuracy: 0,
+      friendliness: 0,
+      overall: 0,
+    };
+  }
+
   const pickup = scorePickup(extraction, callStatus);
   const greeting = scoreGreeting(extraction);
   const responsiveness = scoreResponsiveness(extraction);
